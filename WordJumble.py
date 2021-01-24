@@ -2,6 +2,7 @@
 import json
 
 # function to unjumble the input words and return a list
+import sys
 from itertools import permutations
 
 import enchant
@@ -34,6 +35,49 @@ def findCircledLetters(correctedInputWordList, circlePostions):
 
 # Function to get the highest priority word
 def getFinalWord(size, combinedList, dictData):
+    english_d = enchant.Dict("en_US")
+    maxfreq = sys.maxsize  # set inital as max value
+    currWord = None
+    outputDict = dict()
+
+    word = None
+    #print(type(dictData))
+    # step 1. find word with # no of letters
+    for i in set(permutations(combinedList, size)):
+        word = "".join(i).lower()
+
+        #if english_d.check(word):
+            #print(" English Word ------ ", word)
+            #if('word' not in dictData):
+                #print(" \nWord not found in the dict")
+        if(word in dictData):
+
+            #print(" Word ------ ", word)
+            value = dictData.get(word)
+            if((value!=0) and (value < maxfreq)):
+                maxfreq = value
+                currWord = word
+                print("Current Value:",value, " ", currWord)
+
+    #print("\nMax Freq : ",maxfreq, " ", currWord)
+
+    outputDict[currWord] = maxfreq
+    return outputDict
+
+
+# Function to remove the letters from list/string
+def removeLetters(finalWord, combinedList):
+    print("\nremoveLetter comlist: ",combinedList)
+    word = list(finalWord.keys())[0]
+    word = str(word).upper()
+    print("Word Key: ", word)
+    modifiedW = combinedList
+    print("Type :", type(word[0]), " word[0] : ", word[0])
+    for i in range(len(word)):
+        modifiedW.remove(word[i])
+    #print("\n modifiedW", modifiedW)
+    return modifiedW
+
 
 # processor function to perform all the logic
 def processor(inputWordsList, circlePostions, finalSolutionFormat, dictData):
@@ -42,8 +86,15 @@ def processor(inputWordsList, circlePostions, finalSolutionFormat, dictData):
     print(correctedInputWordList)
     combinedList = findCircledLetters(correctedInputWordList, circlePostions)
     print("CombinedList :", combinedList)
-    for size in finalSolutionFormat:
-        finalWord=getFinalWord(size, combinedList, dictData)
+    print("Final Solution Format :", finalSolutionFormat)
+    #outputDict=None
+    modifiedList = combinedList
+    for i in range(len(finalSolutionFormat)-1):
+        finalWord=getFinalWord(finalSolutionFormat[i], modifiedList, dictData)
+        print("*********\n", finalWord)
+        #send letters to be removed
+        modifiedList=removeLetters(finalWord, combinedList)
+        print("processor : \n modifiedList : ", modifiedList)
 
 
 
