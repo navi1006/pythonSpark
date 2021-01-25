@@ -79,11 +79,18 @@ def removeLetters(finalWord, combinedList):
     word = str(word).upper()
     print("Word Key: ", word)
     modifiedW = combinedList
-    print("Type :", type(word[0]), " word[0] : ", word[0])
+    #print("Type :", type(word[0]), " word[0] : ", word[0])
     for i in range(len(word)):
         modifiedW.remove(word[i])
     # print("\n modifiedW", modifiedW)
     return modifiedW
+
+def checkIfAlreadyExists(solution, fword):
+    existingWords = [val for d in solution for val in d.values()]
+    print("\n seen_words :", existingWords)
+    if fword in existingWords:
+        return True
+    return False
 
 
 # processor function to perform all the logic
@@ -94,27 +101,46 @@ def processor(inputWordsList, circlePositions, finalSolutionFormat, dictData):
     combinedList = findCircledLetters(correctedInputWordList, circlePositions)
     print("CombinedList :", combinedList)
     print("Final Solution Format :", finalSolutionFormat)
-    # outputDict=None
-    comList = combinedList
-    noOfWordsInResult = len(finalSolutionFormat) # to keep track of number of words in final answer
-    allPossibleSolution = [] # to store all solutions
-    result=[]
-    solList=[]
-    getNextWord(0, finalSolutionFormat, comList, dictData, result, solList)
-    print(result)
-    """
-    for i in range(len(finalSolutionFormat) - 1):
-        finalWords = getFinalWord(finalSolutionFormat[i], modifiedList, dictData)  # get the whole ordered list
-        print("*********\n", finalWords)
-        for fword in finalWords:
+    modifiedList = combinedList
+    solList = []
+
+    #comList = combinedList
+    #noOfWordsInResult = len(finalSolutionFormat) # to keep track of number of words in final answer
+    #allPossibleSolution = [] # to store all solutions
+    #result=[]
+
+    #getNextWord(0, finalSolutionFormat, comList, dictData, result, solList)
+    #print(result)
+
+    for i in finalSolutionFormat:
+        finalWords = getFinalWord(i, modifiedList, dictData)  # get the whole ordered list
+        print("*********\n", finalWords, "-----", i)
+        #for fword in finalWords:
+            #if not checkIfAlreadyExists(solList, fword):
+
+        outputDict = {}
+        if len(modifiedList) == i:
+            if len(finalWords)==0:
+                fword = ''.join(map(str, modifiedList)).lower()
+            else :
+                fword = list(finalWords.keys())[0]
+            outputDict[i] = fword
+            solList.append(outputDict)
+        else :  # to take out edge case
+            fword = list(finalWords.keys())[0]
+            outputDict[i] = fword
+            solList.append(outputDict)
             # send letters to be removed
             modifiedList = removeLetters(fword, combinedList)
-            getNextWord(allPossibleSolution, i+1, finalSolutionFormat, modifiedList, dictData, result)
+            #getNextWord(allPossibleSolution, i+1, finalSolutionFormat, modifiedList, dictData, result)
 
-            print("processor : \n modifiedList : ", modifiedList)
-    """
+        print("processor : \n modifiedList : ", modifiedList)
+
+    print("\nsolList :", solList)
 
 
+""" 
+# Recursive backtracking function implementation
 def getNextWord(i, finalSolutionFormat, comList, dictData, result, solList):
     #if (i == len(finalSolutionFormat)):
         #finalWords = getFinalWord(finalSolutionFormat[i], modifiedList, dictData)  # get the whole ordered list
@@ -134,61 +160,71 @@ def getNextWord(i, finalSolutionFormat, comList, dictData, result, solList):
         solList.append(word)
         modifiedList = removeLetters(word, comList)
         getNextWord(i+1, finalSolutionFormat, modifiedList, dictData, result, solList)
-
 """
-def recurseFunction(letters, currentList, segments, i, result, currentFreq):
-    #if (currentFreq >= SCORE_THRESHOLD): return
-    if (i >= len(segments)):
-        result.append({"perm": '-'.join(currentList), "freq": str(currentFreq)})
-        return
-    if (len(letters) <= 0):
-        result.append(currentList)
-        return
 
-    perms = createAllPerms(letters, segments[i])
-    valid_perms_list = validateFromDict(perms)
-    for wordDict in valid_perms_list:
-        word = wordDict["key"]
-        freq = wordDict["value"]
-        newList = list(currentList)
-        newList.append(word)
-        updated_letters = removeLetters(letters, word)
-        recurseFunction(updated_letters, newList, segments, i + 1, result, currentFreq + freq)
+# populate freq_dict values from 0->9999
+def updateDict(dictData):
+    for i, k in dictData.items():
+        if k == 0:
+            dictData[i] = sys.maxsize
 
-"""
 # main function to drive the program
 # input - Get all the possible inputs as parameters
 # read the dict file and pass as parameter to processor
 def main():
     print("main")
+    """
     # puzzle 1
-    # inputWordsList = ("NAGLD", "RAMOJ", "CAMBLE", "WRALEY")
-    # circlePostions = [[1, 3, 4], [2, 3], [0, 1, 3], [0, 2, 4]]  # index values for circled words
-    # finalSolutionFormat = [3, 4, 4]  # number of letters and words in the final solution
-
-    # puzzle 5
+    inputWordsList = ("NAGLD", "RAMOJ", "CAMBLE", "WRALEY")
+    circlePostions = [[1, 3, 4], [2, 3], [0, 1, 3], [0, 2, 4]]  # index values for circled words
+    finalSolutionFormat = [3, 4, 4]  # number of letters and words in the final solution
+    
+    # puzzle 2
+    inputWordsList = ("BNELD", "IDOVA", "SEHEYC", "ARACEM")
+    circlePostions = [[0, 4], [0, 3, 4], [1, 5], [1, 4, 5]]  # index values for circled words
+    finalSolutionFormat = [3, 4, 3]  # number of letters and words in the final solution
+    """
+    # puzzle 3
+    inputWordsList = ("SHAST", "DOORE", "DITNIC", "CATILI")
+    circlePostions = [[0, 3, 4], [0, 1, 3], [0, 1, 2], [0, 2, 5]]  # index values for circled words
+    finalSolutionFormat = [4, 8]  # number of letters and words in the final solution
+    """
+    # puzzle 4
+    inputWordsList = ("KNIDY", "LEGIA", "CRONEE", "TUVEDO")
+    circlePostions = [[0, 1], [0, 2], [1, 3], [0, 5]]  # index values for circled words
+    finalSolutionFormat = [8]  # number of letters and words in the final solution
+    
+     # puzzle 5
     inputWordsList = ("GYRINT", "DRIVET", "SNAMEA", "CEEDIT", "SOWDAH", "ELCHEK")
     circlePostions = [[0, 1, 3], [2, 5], [0, 5], [1, 3, 5], [0, 3], [1, 5]]  # index values for circled words
     finalSolutionFormat = [6, 8]  # number of letters and words in the final solution
-
+"""
     # read the dict json file
-    dictFile = open('freq_dict.json')
-    dictData = json.loads(dictFile.read())
+    #dictFile = open('freq_dict.json')
+    #dictData = json.loads(dictFile.read())
+    #updateFreqDict(dictData)
     # sort the dict based on the vales to main the reading order
-    dictData = {k: v for k, v in sorted(dictData.items(), key=lambda item: item[1])}
+    #dictData = {k: v for k, v in sorted(dictData.items(), key=lambda item: item[1])}
     # print("Main -------", dictData)
-    # call processor fucntion
+    # call processor function
     finalSolution = processor(inputWordsList, circlePostions, finalSolutionFormat, dictData)
 
 
 
 
-"""
+
 if __name__ == "__main__":
     spark = SparkSession \
         .builder \
         .master("local[*]") \
         .appName("Jumbled words puzzle solver") \
         .getOrCreate()
-"""
-main()
+
+    # read the dict json file
+    global dictData
+    dictFile = open('freq_dict.json')
+    dictData = json.loads(dictFile.read())
+    updateDict(dictData)
+    #print(dictData)
+    dictData = {k: v for k, v in sorted(dictData.items(), key=lambda item: item[1])}
+    main()
