@@ -26,9 +26,9 @@ def findInputWords(inputWordsList):
 
 # Function to return all the circled letters
 def findCircledLetters(correctedInputWordList, circlePostions):
-    print("findCircledLetters")
+    #print("findCircledLetters")
     combinedList = []
-    print(circlePostions)
+    #print(circlePostions)
     for i in range(len(correctedInputWordList)):
         for j in range(len(circlePostions[i])):
             combinedList.append(correctedInputWordList[i][circlePostions[i][j]].upper())
@@ -55,6 +55,7 @@ def getFinalWord(size, combinedList, dictData):
         # print(" English Word ------ ", word)
         # if('word' not in dictData):
         # print(" \nWord not found in the dict")
+
         if (word in dictData):
             # print(" Word ------ ", word)
             value = dictData.get(word)
@@ -73,34 +74,34 @@ def getFinalWord(size, combinedList, dictData):
 
 # Function to remove the letters from list/string
 def removeLetters(finalWord, combinedList):
-    print("\nremoveLetter comlist: ", combinedList)
+    #print("\nremoveLetter comlist: ", combinedList)
     # word = list(finalWord.keys())[0]
     word = finalWord
     word = str(word).upper()
     print("Word Key: ", word)
     modifiedW = combinedList
-    #print("Type :", type(word[0]), " word[0] : ", word[0])
     for i in range(len(word)):
         modifiedW.remove(word[i])
     # print("\n modifiedW", modifiedW)
     return modifiedW
 
+"""
 def checkIfAlreadyExists(solution, fword):
     existingWords = [val for d in solution for val in d.values()]
-    print("\n seen_words :", existingWords)
+    #print("\n existingWords :", existingWords)
     if fword in existingWords:
         return True
     return False
-
+"""
 
 # processor function to perform all the logic
 def processor(inputWordsList, circlePositions, finalSolutionFormat, dictData):
-    print("Processor")
+    #print("Processor")
     correctedInputWordList = findInputWords(inputWordsList)  # will hold unjumbled input list
-    print(correctedInputWordList)
+    #print(correctedInputWordList)
     combinedList = findCircledLetters(correctedInputWordList, circlePositions)
-    print("CombinedList :", combinedList)
-    print("Final Solution Format :", finalSolutionFormat)
+    #print("CombinedList :", combinedList)
+    #print("Final Solution Format :", finalSolutionFormat)
     modifiedList = combinedList
     solList = []
 
@@ -114,7 +115,7 @@ def processor(inputWordsList, circlePositions, finalSolutionFormat, dictData):
 
     for i in finalSolutionFormat:
         finalWords = getFinalWord(i, modifiedList, dictData)  # get the whole ordered list
-        print("*********\n", finalWords, "-----", i)
+
         #for fword in finalWords:
             #if not checkIfAlreadyExists(solList, fword):
 
@@ -173,32 +174,51 @@ def updateDict(dictData):
 # read the dict file and pass as parameter to processor
 def main():
     print("main")
-    """
+    inputWordsList = []
+    circlePostions = []
+    finalSolutionFormat = []
+
     # puzzle 1
-    inputWordsList = ("NAGLD", "RAMOJ", "CAMBLE", "WRALEY")
-    circlePostions = [[1, 3, 4], [2, 3], [0, 1, 3], [0, 2, 4]]  # index values for circled words
-    finalSolutionFormat = [3, 4, 4]  # number of letters and words in the final solution
+    inputWords = ("NAGLD", "RAMOJ", "CAMBLE", "WRALEY")
+    inputWordsList.append(inputWords)
+    circlePos = [[1, 3, 4], [2, 3], [0, 1, 3], [0, 2, 4]]  # index values for circled words
+    circlePostions.append(circlePos)
+    finalSol = [3, 4, 4]  # number of letters and words in the final solution
+    finalSolutionFormat.append(finalSol)
+    #print(" +++++++++ \n", inputWordsList, finalSolutionFormat)
     
     # puzzle 2
-    inputWordsList = ("BNELD", "IDOVA", "SEHEYC", "ARACEM")
-    circlePostions = [[0, 4], [0, 3, 4], [1, 5], [1, 4, 5]]  # index values for circled words
-    finalSolutionFormat = [3, 4, 3]  # number of letters and words in the final solution
-    """
+    inputWords = ("BNELD", "IDOVA", "SEHEYC", "ARACEM")
+    inputWordsList.append(inputWords)
+    circlePos = [[0, 4], [0, 3, 4], [1, 5], [1, 4, 5]]  # index values for circled words
+    circlePostions.append(circlePos)
+    finalSol = [3, 4, 3]  # number of letters and words in the final solution
+    finalSolutionFormat.append(finalSol)
+
     # puzzle 3
-    inputWordsList = ("SHAST", "DOORE", "DITNIC", "CATILI")
-    circlePostions = [[0, 3, 4], [0, 1, 3], [0, 1, 2], [0, 2, 5]]  # index values for circled words
-    finalSolutionFormat = [4, 8]  # number of letters and words in the final solution
-    """
+    inputWords = ("SHAST", "DOORE", "DITNIC", "CATILI")
+    inputWordsList.append(inputWords)
+    circlePos = [[0, 3, 4], [0, 1, 3], [0, 1, 2], [0, 2, 5]]  # index values for circled words
+    circlePostions.append(circlePos)
+    finalSol = [4, 8]  # number of letters and words in the final solution
+    finalSolutionFormat.append(finalSol)
+
     # puzzle 4
-    inputWordsList = ("KNIDY", "LEGIA", "CRONEE", "TUVEDO")
-    circlePostions = [[0, 1], [0, 2], [1, 3], [0, 5]]  # index values for circled words
-    finalSolutionFormat = [8]  # number of letters and words in the final solution
+    inputWords = ("KNIDY", "LEGIA", "CRONEE", "TUVEDO")
+    inputWordsList.append(inputWords)
+    circlePos = [[0, 1], [0, 2], [1, 3], [0, 5]]  # index values for circled words
+    circlePostions.append(circlePos)
+    finalSol = [8]  # number of letters and words in the final solution
+    finalSolutionFormat.append(finalSol)
     
-     # puzzle 5
-    inputWordsList = ("GYRINT", "DRIVET", "SNAMEA", "CEEDIT", "SOWDAH", "ELCHEK")
-    circlePostions = [[0, 1, 3], [2, 5], [0, 5], [1, 3, 5], [0, 3], [1, 5]]  # index values for circled words
-    finalSolutionFormat = [6, 8]  # number of letters and words in the final solution
-"""
+    # puzzle 5
+    inputWords = ("GYRINT", "DRIVET", "SNAMEA", "CEEDIT", "SOWDAH", "ELCHEK")
+    inputWordsList.append(inputWords)
+    circlePos = [[0, 1, 3], [2, 5], [0, 5], [1, 3, 5], [0, 3], [1, 5]]  # index values for circled words
+    circlePostions.append(circlePos)
+    finalSol = [6, 8]  # number of letters and words in the final solution
+    finalSolutionFormat.append(finalSol)
+
     # read the dict json file
     #dictFile = open('freq_dict.json')
     #dictData = json.loads(dictFile.read())
@@ -207,7 +227,8 @@ def main():
     #dictData = {k: v for k, v in sorted(dictData.items(), key=lambda item: item[1])}
     # print("Main -------", dictData)
     # call processor function
-    finalSolution = processor(inputWordsList, circlePostions, finalSolutionFormat, dictData)
+    for i in range(5):
+        finalSolution = processor(inputWordsList[i], circlePostions[i], finalSolutionFormat[i], dictData)
 
 
 
@@ -217,14 +238,16 @@ if __name__ == "__main__":
     spark = SparkSession \
         .builder \
         .master("local[*]") \
-        .appName("Jumbled words puzzle solver") \
+        .appName("Jumbled words puzzle") \
         .getOrCreate()
 
+    sc = spark.sparkContext
     # read the dict json file
     global dictData
     dictFile = open('freq_dict.json')
     dictData = json.loads(dictFile.read())
     updateDict(dictData)
+    #dictData = sc.parallelize(dictData)
     #print(dictData)
-    dictData = {k: v for k, v in sorted(dictData.items(), key=lambda item: item[1])}
+    dictData = {k: v for k, v in sorted(dictData.items(), key=lambda item: item[1])} # sorting the dict
     main()
