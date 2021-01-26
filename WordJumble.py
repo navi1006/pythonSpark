@@ -1,14 +1,11 @@
 # libraries
 import json
-# function to unjumble the input words and return a list
 import sys
 from itertools import permutations
-
 import enchant
-
 from pyspark.sql import SparkSession
 
-
+# function to unjumble the input words and return a list
 def findInputWords(inputWordsList):
     # loop through inputwordlist to find the correct word save it in a list
     english_d = enchant.Dict("en_US")
@@ -17,10 +14,10 @@ def findInputWords(inputWordsList):
         letters = [x.lower() for x in word]
         for y in set(permutations(letters)):  # converted from list to set to get unique permutations
             permutationWord = "".join(y)
-            if len(permutationWord) > 2:
-                if english_d.check(permutationWord):
-                    # print(permutationWord)
-                    unJumbledWordList.append(permutationWord)
+            #if len(permutationWord) > 2:
+            if english_d.check(permutationWord):
+                # print(permutationWord)
+                unJumbledWordList.append(permutationWord)
     return unJumbledWordList
 
 
@@ -55,14 +52,15 @@ def getFinalWord(size, combinedList, dictData):
         # print(" English Word ------ ", word)
         # if('word' not in dictData):
         # print(" \nWord not found in the dict")
-
+        #if (word in dictData.collect()):
         if (word in dictData):
             # print(" Word ------ ", word)
             value = dictData.get(word)
+            #value = dictData.contains(word)
             if ((value != 0) and (value < maxfreq)):
                 maxfreq = value
                 currWord = word
-                print("Current Value:", value, " ", currWord)
+                # print("Current Value:", value, " ", currWord)
                 outputDict[currWord] = maxfreq
     # sort the dict based on the values(freq)
     outputDict = {k: v for k, v in sorted(outputDict.items(), key=lambda item: item[1])}
@@ -78,7 +76,7 @@ def removeLetters(finalWord, combinedList):
     # word = list(finalWord.keys())[0]
     word = finalWord
     word = str(word).upper()
-    print("Word Key: ", word)
+    # print("Word Key: ", word)
     modifiedW = combinedList
     for i in range(len(word)):
         modifiedW.remove(word[i])
@@ -104,14 +102,15 @@ def processor(inputWordsList, circlePositions, finalSolutionFormat, dictData):
     #print("Final Solution Format :", finalSolutionFormat)
     modifiedList = combinedList
     solList = []
-
+    freqTotal = 0  # to keep track of freq of the words that are part of the solution
+    finalOutput = {} # to keeo mapping of solList and respective freq total
     #comList = combinedList
     #noOfWordsInResult = len(finalSolutionFormat) # to keep track of number of words in final answer
     #allPossibleSolution = [] # to store all solutions
     #result=[]
 
     #getNextWord(0, finalSolutionFormat, comList, dictData, result, solList)
-    #print(result)
+
 
     for i in finalSolutionFormat:
         finalWords = getFinalWord(i, modifiedList, dictData)  # get the whole ordered list
@@ -119,25 +118,44 @@ def processor(inputWordsList, circlePositions, finalSolutionFormat, dictData):
         #for fword in finalWords:
             #if not checkIfAlreadyExists(solList, fword):
 
-        outputDict = {}
-        if len(modifiedList) == i:
-            if len(finalWords)==0:
+        outputDict = {} # will hold final format word length and word
+
+        if len(modifiedList) == i: # case when the last finalsolutionformat remaining
+            if len(finalWords) == 0:
                 fword = ''.join(map(str, modifiedList)).lower()
-            else :
+                if(fword in dictData):
+                    outputDict[i] = fword
+                    freq = dictData.get(fword)
+                    solList.append(outputDict)
+                else:
+                    freq = 0
+                    print("\n* Solution not found : ", fword)
+            else:
                 fword = list(finalWords.keys())[0]
-            outputDict[i] = fword
-            solList.append(outputDict)
-        else :  # to take out edge case
+                freq = dictData.get(fword)
+                outputDict[i] = fword
+                solList.append(outputDict)
+                #print(" freq :", freq, " word:", fword)
+
+        else:  # to take out edge case
             fword = list(finalWords.keys())[0]
+            freq = dictData.get(fword)
             outputDict[i] = fword
             solList.append(outputDict)
             # send letters to be removed
             modifiedList = removeLetters(fword, combinedList)
             #getNextWord(allPossibleSolution, i+1, finalSolutionFormat, modifiedList, dictData, result)
 
-        print("processor : \n modifiedList : ", modifiedList)
+        # print("processor : \n modifiedList : ", modifiedList)
+        # condition to check if freq was updated from 0 to sys.maxsize
+        if freq == sys.maxsize:
+            freq = 0
+        freqTotal = freqTotal + freq
 
-    print("\nsolList :", solList)
+    finalOutput[freqTotal] = solList
+    #print("\nsolList :", solList)
+    #print(" freq Total : ", freqTotal)
+    return finalOutput
 
 
 """ 
@@ -185,7 +203,6 @@ def main():
     circlePostions.append(circlePos)
     finalSol = [3, 4, 4]  # number of letters and words in the final solution
     finalSolutionFormat.append(finalSol)
-    #print(" +++++++++ \n", inputWordsList, finalSolutionFormat)
     
     # puzzle 2
     inputWords = ("BNELD", "IDOVA", "SEHEYC", "ARACEM")
@@ -225,10 +242,11 @@ def main():
     #updateFreqDict(dictData)
     # sort the dict based on the vales to main the reading order
     #dictData = {k: v for k, v in sorted(dictData.items(), key=lambda item: item[1])}
-    # print("Main -------", dictData)
+
     # call processor function
     for i in range(5):
         finalSolution = processor(inputWordsList[i], circlePostions[i], finalSolutionFormat[i], dictData)
+        print(" \n ---------------- Solution for image ", i+1, " : ", finalSolution)
 
 
 
@@ -247,7 +265,8 @@ if __name__ == "__main__":
     dictFile = open('freq_dict.json')
     dictData = json.loads(dictFile.read())
     updateDict(dictData)
+    dictData = {k: v for k, v in sorted(dictData.items(), key=lambda item: item[1])}  # sorting the dict
     #dictData = sc.parallelize(dictData)
-    #print(dictData)
-    dictData = {k: v for k, v in sorted(dictData.items(), key=lambda item: item[1])} # sorting the dict
     main()
+
+    spark.stop()
